@@ -41,6 +41,19 @@ The app automatically calculates and displays your chances of pulling:
 
 These probabilities update instantly as you mark packs.
 
+#### Probability Deviation Chart
+A dynamic line chart that visualizes how probabilities change over time:
+- Shows current probability vs. baseline for each category
+- Toggle between Chasers, Teams, and Floors
+- Baseline indicator shows how far current odds deviate from starting probability:
+  - 🟡 Yellow: Within ±5% of baseline
+  - 🟢 Green: More than 5% above baseline
+  - 🔴 Red: More than 5% below baseline
+- Smooth line tracks probability changes as packs are opened
+- X-axis shows all 60 packs
+- Y-axis displays probability percentage
+- Hover over any point to see exact values
+
 ## 💻 Installation
 
 1. Download this project to your computer:
@@ -79,6 +92,16 @@ The probability panel shows your chances for each type of pack:
 - These numbers are calculated based on what's left
 - Example: If "Chaser: 25%" appears, you have a 25% chance of pulling a chaser with your next pack
 
+The probability deviation chart helps track probability changes:
+- Use the toggles to switch between Chasers, Teams, and Floors
+- The grey line shows the starting probability (baseline)
+- The solid line shows how probabilities change as packs are opened
+- The deviation indicator shows if you're above/below baseline:
+  - Yellow means you're close to baseline (within ±5%)
+  - Green means probabilities are better than baseline (>5% above)
+  - Red means probabilities are worse than baseline (>5% below)
+- Hover over the line to see exact probabilities at any point
+
 ### Teams Section
 - All 32 NFL teams are displayed
 - Unpulled teams appear in gray
@@ -109,8 +132,6 @@ The probability panel shows your chances for each type of pack:
 - **Quick Reference**: Hover over any team-marked pack to see which team it was
 - **Project Organization**: Create separate projects for each different stream
 - **Completion**: Use "Mark Complete" when done to prevent accidental changes
-- **Personal Tracking**: Use the checkbox to distinguish between packs you pulled vs. observed
-- **Corrections**: Click on any pack again to modify its status or remove it from your personal list
 
 ## 🎨 Color Guide
 - **Green**: Chaser packs
@@ -132,6 +153,9 @@ A: No, completed projects are locked to prevent accidental changes.
 
 **Q: How are probabilities calculated?**  
 A: The app uses the remaining pack counts divided by total unopened packs to calculate percentages.
+
+**Q: What does the baseline in the probability chart mean?**  
+A: The baseline is your starting probability for each type (e.g., 13.33% for Chasers since 8/60 = 13.33%). It helps you see if your current odds are better or worse than what you started with.
 
 ## 📞 Support
 Don't ask for help.

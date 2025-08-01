@@ -1,5 +1,14 @@
 class PackTracker {
     constructor() {
+        // Initialize Chart.js configuration
+        this.chart = null;
+        this.selectedChartType = 'chaser';
+        this.probabilityHistory = {
+            chasers: [],
+            teams: [],
+            floors: []
+        };
+        this.lastProbabilities = null; // Store last probabilities to detect changes
         this.totalPacks = 60;
         this.initialCounts = {
             chasers: 8,
@@ -60,7 +69,179 @@ class PackTracker {
         
         this.initializeUI();
         this.loadState();
+        this.initializeChart();
         this.updateUI();
+        this.initializeProbabilityHistory();
+    }
+
+    initializeChart() {
+        const ctx = document.getElementById('probabilityChart').getContext('2d');
+        
+        // Calculate baseline probabilities
+        const baselineProbabilities = {
+            chaser: (this.initialCounts.chasers / this.totalPacks) * 100,
+            team: (this.initialCounts.teams / this.totalPacks) * 100,
+            floor: (this.initialCounts.floors / this.totalPacks) * 100
+        };
+
+        this.chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Current Probability',
+                        data: [],
+                        borderColor: 'rgb(75, 192, 192)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: false,
+                        spanGaps: false, // Don't connect through null values
+                        borderWidth: 3, // Slightly thicker line for better curve visibility
+                        cubicInterpolationMode: 'default' // Natural curve interpolation
+                    },
+                    {
+                        label: 'Baseline',
+                        data: [],
+                        borderColor: 'rgba(200, 200, 200, 0.8)',
+                        borderWidth: 1,
+                        tension: 0, // Keep baseline straight
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => {
+                                const label = context.dataset.label;
+                                const value = context.parsed.y.toFixed(2);
+                                if (label === 'Current Probability') {
+                                    const baseline = baselineProbabilities[this.selectedChartType];
+                                    const deviation = (context.parsed.y - baseline).toFixed(2);
+                                    const sign = deviation >= 0 ? '+' : '';
+                                    return `${label}: ${value}% (${sign}${deviation}% from baseline)`;
+                                }
+                                return `${label}: ${value}%`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Pack Number',
+                            padding: { top: 20 } // Add padding to account for rotated labels
+                        },
+                        ticks: {
+                            callback: (value) => value + 1,
+                            autoSkip: false, // Show all ticks
+                            maxRotation: 0,
+                            minRotation: 0,
+                            font: {
+                                size: 10 // Smaller font size to help fit all numbers
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Probability'
+                        },
+                        min: 0,
+                        suggestedMax: 25,
+                        ticks: {
+                            callback: (value) => `${Math.round(value)}%`
+                        }
+                    }
+                }
+            }
+        });
+
+        // Add event listeners for chart type toggles
+        document.querySelectorAll('.chart-toggle').forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                document.querySelectorAll('.chart-toggle').forEach(t => t.classList.remove('active'));
+                toggle.classList.add('active');
+                this.selectedChartType = toggle.dataset.type;
+                this.updateChart();
+            });
+        });
+    }
+
+    updateChart() {
+        if (!this.chart) return;
+
+        const baselineProbabilities = {
+            chaser: (this.initialCounts.chasers / this.totalPacks) * 100,
+            team: (this.initialCounts.teams / this.totalPacks) * 100,
+            floor: (this.initialCounts.floors / this.totalPacks) * 100
+        };
+
+        const currentProbs = this.probabilityHistory[this.selectedChartType + 's'];
+        // Always create 60 labels for all packs
+        const labels = Array.from({ length: this.totalPacks }, (_, i) => i);
+        // Extend the current probabilities array to 60 items, filling with null for unopened packs
+        // Extend array to 60 items, with null for unopened packs
+        const extendedProbs = [...currentProbs, ...Array(this.totalPacks - currentProbs.length).fill(null)];
+        const baselineData = Array(this.totalPacks).fill(baselineProbabilities[this.selectedChartType]);
+
+        // Update chart colors based on selected type
+        let color;
+        switch (this.selectedChartType) {
+            case 'chaser':
+                color = getComputedStyle(document.documentElement).getPropertyValue('--color-chaser').trim();
+                break;
+            case 'team':
+                color = getComputedStyle(document.documentElement).getPropertyValue('--color-team').trim();
+                break;
+            case 'floor':
+                color = getComputedStyle(document.documentElement).getPropertyValue('--color-floor').trim();
+                break;
+        }
+
+        this.chart.data.labels = labels;
+        this.chart.data.datasets[0].data = extendedProbs;
+        this.chart.data.datasets[0].borderColor = color;
+        this.chart.data.datasets[1].data = baselineData;
+
+        // Update y-axis scale if needed
+        const maxProb = Math.max(...currentProbs, baselineProbabilities[this.selectedChartType]);
+        this.chart.options.scales.y.suggestedMax = Math.ceil(maxProb / 5) * 5;
+
+        this.chart.update();
+
+        // Update deviation badge
+        if (currentProbs.length > 0) {
+            const currentProb = currentProbs[currentProbs.length - 1];
+            const baseline = baselineProbabilities[this.selectedChartType];
+            const deviation = currentProb - baseline;
+            const deviationBadge = document.querySelector('.deviation-badge');
+            const formattedDeviation = Math.abs(deviation).toFixed(2);
+            
+            deviationBadge.textContent = `${deviation >= 0 ? '+' : '-'}${formattedDeviation}% from baseline`;
+            // Determine badge class based on deviation range
+            let badgeClass;
+            if (Math.abs(deviation) <= 5) {
+                badgeClass = 'neutral';
+            } else if (deviation > 5) {
+                badgeClass = 'positive';
+            } else {
+                badgeClass = 'negative';
+            }
+            deviationBadge.className = `deviation-badge ${badgeClass}`;
+        }
     }
 
     initializeUI() {
@@ -295,6 +476,7 @@ class PackTracker {
         });
 
         this.updateUI();
+        this.updateProbabilityHistory();
         this.saveState();
         document.getElementById('packModal').style.display = 'none';
     }
@@ -331,6 +513,61 @@ class PackTracker {
             team: (remainingTeams / unopenedCount) * 100,
             floor: (remainingFloors / unopenedCount) * 100
         };
+    }
+
+    updateProbabilityHistory(forceUpdate = false) {
+        const probs = this.calculateProbabilities();
+        
+        // Only update history if probabilities have changed or force update is requested
+        if (forceUpdate || !this.lastProbabilities || 
+            probs.chaser !== this.lastProbabilities.chaser ||
+            probs.team !== this.lastProbabilities.team ||
+            probs.floor !== this.lastProbabilities.floor) {
+            
+            this.probabilityHistory.chasers.push(probs.chaser);
+            this.probabilityHistory.teams.push(probs.team);
+            this.probabilityHistory.floors.push(probs.floor);
+            this.lastProbabilities = probs;
+            
+            this.updateChart();
+        }
+    }
+
+    initializeProbabilityHistory() {
+        // Clear existing history
+        this.probabilityHistory = {
+            chasers: [],
+            teams: [],
+            floors: []
+        };
+        this.lastProbabilities = null;
+
+        // Count non-unopened packs to determine how many steps to simulate
+        const markedPacks = this.packs.filter(pack => pack.status !== 'unopened').length;
+        
+        if (markedPacks > 0) {
+            // Create a temporary copy of packs
+            const tempPacks = [...this.packs];
+            
+            // Reset all packs to unopened
+            this.packs = new Array(this.totalPacks).fill(null).map((_, index) => ({
+                number: index + 1,
+                status: 'unopened',
+                team: null,
+                chaser: null
+            }));
+            
+            // Simulate marking each pack in sequence
+            for (let i = 0; i < tempPacks.length; i++) {
+                if (tempPacks[i].status !== 'unopened') {
+                    this.packs[i] = tempPacks[i];
+                    this.updateProbabilityHistory(true);
+                }
+            }
+        } else {
+            // If no packs are marked, just add initial probabilities
+            this.updateProbabilityHistory(true);
+        }
     }
 
     updateUI() {
@@ -494,7 +731,9 @@ class PackTracker {
             teamsPulled: Array.from(this.teamsPulled),
             chasersPulled: Array.from(this.chasersPulled),
             actionHistory: this.actionHistory,
-            pulledPacks: Array.from(this.pulledPacks)
+            pulledPacks: Array.from(this.pulledPacks),
+            probabilityHistory: this.probabilityHistory,
+            lastProbabilities: this.lastProbabilities
         };
         localStorage.setItem(`packTracker_${this.projectId}`, JSON.stringify(state));
     }
@@ -526,6 +765,8 @@ class PackTracker {
             this.chasersPulled = new Set(state.chasersPulled || []);
             this.actionHistory = state.actionHistory;
             this.pulledPacks = new Set(state.pulledPacks || []);
+            this.probabilityHistory = state.probabilityHistory || { chasers: [], teams: [], floors: [] };
+            this.lastProbabilities = state.lastProbabilities;
 
             // Reapply team colors to pulled teams
             const teamsGrid = document.getElementById('teamsGrid');
@@ -588,6 +829,12 @@ class PackTracker {
         this.chasersPulled.clear();
         this.pulledPacks.clear();
         this.actionHistory = [];
+        this.probabilityHistory = {
+            chasers: [],
+            teams: [],
+            floors: []
+        };
+        this.lastProbabilities = null;
 
         // Reset all team items to unopened state
         const teamsGrid = document.getElementById('teamsGrid');

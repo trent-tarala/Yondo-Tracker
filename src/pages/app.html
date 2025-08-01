@@ -71,6 +71,25 @@
         </div>
     </div>
 
+    <div class="probability-chart-panel">
+        <div class="chart-header">
+            <div class="chart-header-left">
+                <h2>Probability Deviation</h2>
+                <div class="chart-type-toggles">
+                    <button class="chart-toggle active" data-type="chaser">Chasers</button>
+                    <button class="chart-toggle" data-type="team">Teams</button>
+                    <button class="chart-toggle" data-type="floor">Floors</button>
+                </div>
+            </div>
+            <div class="baseline-deviation">
+                <span class="deviation-badge">Loading...</span>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="probabilityChart"></canvas>
+        </div>
+    </div>
+
     <div class="pulled-packs-panel">
         <h2>Packs You Pulled</h2>
         <table id="pulledPacksTable" class="pulled-packs-table">
@@ -112,6 +131,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../js/teamColors.js"></script>
     <script src="../js/app.js"></script>
 </body>
