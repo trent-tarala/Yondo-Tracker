@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yondo Tracker</title>
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Loading...</h1>
+            <div class="header-controls">
+                <button id="resetBtn" class="control-btn danger-btn">Reset All</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="stats-container">
+            <div class="probability-panel">
+                <h2>Pack Probabilities</h2>
+                <div class="probability-stats">
+                                    <div class="stat" data-type="chaser">
+                    <label>Chasers:</label>
+                    <span id="chaserProb">0.0%</span>
+                </div>
+                <div class="stat" data-type="team">
+                    <label>Teams:</label>
+                    <span id="teamProb">0.0%</span>
+                </div>
+                <div class="stat" data-type="floor">
+                    <label>Floors:</label>
+                    <span id="floorProb">0.0%</span>
+                </div>
+                </div>
+            </div>
+
+            <div class="remaining-packs-panel">
+                <h2>Remaining Packs</h2>
+                <div class="remaining-packs-stats">
+                    <div class="stat" data-type="chaser">
+                        <label>Chasers:</label>
+                        <span id="chaserRemaining">8/8</span>
+                    </div>
+                    <div class="stat" data-type="team">
+                        <label>Teams:</label>
+                        <span id="teamRemaining">32/32</span>
+                    </div>
+                    <div class="stat" data-type="floor">
+                        <label>Floors:</label>
+                        <span id="floorRemaining">20/20</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-container">
+            <div id="packGrid" class="pack-grid">
+                <!-- Packs will be generated here by JavaScript -->
+            </div>
+        </div>
+
+        <div class="teams-panel">
+            <h2>Teams Pulled</h2>
+            <div id="teamsGrid" class="teams-grid">
+                <!-- Teams will be generated here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <div class="pulled-packs-panel">
+        <h2>Packs You Pulled</h2>
+        <table id="pulledPacksTable" class="pulled-packs-table">
+            <thead>
+                <tr>
+                    <th>Pack Number</th>
+                    <th>Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="pulledPacksTableBody">
+                <!-- Pulled packs will be generated here by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pack Status Modal -->
+    <div id="packModal" class="modal">
+        <div class="modal-content">
+            <h2>Pack Pulled</h2>
+            <div class="status-options">
+                <button class="status-btn" data-status="chaser">Chaser</button>
+                <button class="status-btn" data-status="team">Team</button>
+                <button class="status-btn" data-status="floor">Floor</button>
+            </div>
+            <div id="teamSelection" class="team-selection" style="display: none;">
+                <!-- Team options will be generated here by JavaScript -->
+            </div>
+            <div id="chaserSelection" class="chaser-selection" style="display: none;">
+                <!-- Chaser options will be generated here by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <div class="checkbox-container">
+                    <input type="checkbox" id="packPulledCheckbox">
+                    <label for="packPulledCheckbox">This was a pack I pulled</label>
+                </div>
+                <button id="closeModal" class="secondary-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/teamColors.js"></script>
+    <script src="../js/app.js"></script>
+</body>
+</html>

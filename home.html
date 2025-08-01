@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yondo Tracker</title>
+    <link rel="stylesheet" href="src/css/base.css">
+    <link rel="stylesheet" href="src/css/components.css">
+    <link rel="stylesheet" href="src/css/dashboard.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Yondo Tracker</h1>
+            <button id="newProjectBtn" class="control-btn">New Project</button>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <table class="projects-table">
+            <thead>
+                <tr>
+                    <th>Project Name</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="projectsList">
+                <!-- Projects will be listed here -->
+            </tbody>
+            <tfoot id="noProjectsMessage" style="display: none;">
+                <tr>
+                    <td colspan="3" class="no-projects-message">
+                        Looks like you haven't created any projects yet. Click the "New Project" button to get started!
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- New Project Modal -->
+    <div id="newProjectModal" class="modal">
+        <div class="modal-content">
+            <h2>Create New Project</h2>
+            <form id="newProjectForm">
+                <div class="form-group">
+                    <label for="projectName">Project Name</label>
+                    <input type="text" id="projectName" placeholder="Project Name" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelProject" class="secondary-btn">Cancel</button>
+                    <button type="submit" class="primary-btn">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="src/js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+/* CSS Reset and Base Styles */
+:root {
+    /* Colors */
+    --color-primary: #1976D2;
+    --color-success: #388E3C;
+    --color-warning: #FFD700;
+    --color-danger: #D32F2F;
+    
+    /* Dark Theme Colors */
+    --color-background: #121212;
+    --color-surface: #1E1E1E;
+    --color-surface-light: #2D2D2D;
+    --color-grey-100: #333333;
+    --color-grey-200: #424242;
+    --color-grey-300: #616161;
+    --color-grey-600: #9E9E9E;
+    --color-grey-900: #FFFFFF;
+    
+    /* Pack Status Colors */
+    --color-unopened: var(--color-grey-300);
+    --color-chaser: var(--color-success);
+    --color-team: var(--color-primary);
+    --color-floor: var(--color-danger);
+    
+    /* Typography */
+    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-bold: 600;
+    
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    
+    /* Layout */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --container-max-width: 1200px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.1);
+    
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-normal: 250ms ease;
+}
+
+/* Reset */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: 1.5;
+    color: var(--color-grey-900);
+    background-color: var(--color-background);
+    padding: var(--spacing-md);
+}
+
+/* Header Styles */
+header {
+    margin-bottom: var(--spacing-lg);
+}
+
+header .container {
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    background: var(--color-surface);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--color-grey-100);
+}
+
+header h1 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-grey-900);
+}
+
+.header-controls {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+/* Button Styles */
+.control-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    font-weight: var(--font-weight-medium);
+    transition: filter var(--transition-fast);
+}
+
+.control-btn:hover {
+    filter: brightness(1.1);
+}
+
+.control-btn.danger-btn {
+    background: var(--color-danger);
+}
+
+.control-btn.success-btn {
+    background: var(--color-success);
+}
+
+.primary-btn {
+    background: var(--color-primary);
+    color: white;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    font-weight: var(--font-weight-medium);
+    transition: filter var(--transition-fast);
+}
+
+.primary-btn:hover {
+    filter: brightness(1.1);
+}
+
+.secondary-btn {
+    background: var(--color-grey-200);
+    color: var(--color-grey-900);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    font-weight: var(--font-weight-medium);
+    transition: background-color var(--transition-fast);
+}
+
+.secondary-btn:hover {
+    background: var(--color-grey-300);
+}
+
+/* Form Elements */
+input {
+    font-family: inherit;
+    font-size: inherit;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-grey-300);
+    border-radius: var(--border-radius-md);
+    width: 100%;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}

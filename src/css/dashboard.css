@@ -1,0 +1,215 @@
+/* Dashboard Container */
+.dashboard-container {
+    background: var(--color-surface);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-md);
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    border: 1px solid var(--color-grey-100);
+}
+
+/* Projects Table */
+.projects-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--color-grey-200);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Column widths */
+.projects-table th:nth-child(1) { width: 60%; } /* Project Name */
+.projects-table th:nth-child(2) { width: 15%; } /* Date */
+.projects-table th:nth-child(3) { width: 15%; } /* Status */
+.projects-table th:nth-child(4) { width: 10%; } /* Actions */
+
+/* Status styles */
+.status-badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    text-align: center;
+    color: var(--color-surface-light);
+}
+
+.status-badge.completed {
+    background: var(--color-success);
+}
+
+.status-badge.in-progress {
+    background: var(--color-primary);
+}
+
+.status-badge.not-started {
+    background: var(--color-grey-600);
+}
+
+/* Center align status column */
+.projects-table th:nth-child(3),
+.projects-table td:nth-child(3) {
+    text-align: center;
+}
+
+#noProjectsMessage td {
+    text-align: center !important;
+    padding: var(--spacing-xl) !important;
+    color: var(--color-grey-600);
+    font-size: var(--font-size-lg);
+}
+
+.projects-table th,
+.projects-table td {
+    padding: var(--spacing-md);
+    text-align: left;
+    height: 64px;
+    box-sizing: border-box;
+}
+
+.projects-table tbody tr:not(:last-child) td {
+    border-bottom: 1px solid var(--color-grey-200);
+}
+
+/* Column alignments */
+/* Date column (second column) */
+.projects-table th:nth-child(2),
+.projects-table td:nth-child(2) {
+    text-align: center;
+}
+
+/* Actions column (last column) */
+.projects-table th:last-child,
+.projects-table td:last-child {
+    text-align: center;
+}
+
+
+.projects-table th {
+    font-weight: var(--font-weight-medium);
+    color: var(--color-grey-600);
+    background: var(--color-surface-light);
+    border-bottom: 1px solid var(--color-grey-200);
+}
+
+.projects-table tbody tr:hover {
+    background-color: var(--color-surface-light);
+}
+
+/* Project Row */
+.project-row {
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.project-row:hover {
+    background-color: var(--color-grey-100);
+}
+
+.project-name {
+    font-weight: var(--font-weight-medium);
+    color: var(--color-grey-900);
+    white-space: nowrap;
+}
+
+/* Delete Button */
+.delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity var(--transition-fast);
+    padding: var(--spacing-xs);
+    display: inline-flex;
+    justify-content: center;
+}
+
+.delete-btn:hover {
+    opacity: 1;
+}
+
+.trash-icon {
+    width: 20px;
+    height: 20px;
+    fill: var(--color-danger);
+}
+
+/* Completed Badge */
+.completed-badge {
+    background: var(--color-success);
+    color: white;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-lg);
+    font-size: var(--font-size-sm);
+    margin-left: var(--spacing-sm);
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-md);
+}
+
+.modal-content {
+    background: var(--color-surface);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    width: 100%;
+    max-width: 500px;
+    border: 1px solid var(--color-grey-100);
+}
+
+.modal-content h2 {
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-xl);
+    color: var(--color-grey-900);
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-group label {
+    display: none;
+}
+
+.form-group input {
+    background: var(--color-surface) !important;
+    border: 1px solid var(--color-grey-100);
+    color: var(--color-grey-900);
+    padding: var(--spacing-md);
+    width: 100%;
+    border-radius: var(--border-radius-md);
+}
+
+.form-group input:-webkit-autofill,
+.form-group input:-webkit-autofill:hover,
+.form-group input:-webkit-autofill:focus,
+.form-group input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--color-surface) inset !important;
+    -webkit-text-fill-color: var(--color-grey-900) !important;
+}
+
+.form-group input::placeholder {
+    color: var(--color-grey-600);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
