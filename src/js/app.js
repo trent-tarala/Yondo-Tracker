@@ -256,28 +256,54 @@ class PackTracker {
 
         // Update deviation badge
         if (currentProbs.length > 0) {
-            // Calculate the current probability for the next selection
-            const currentProb = this.calculateNextProbability(this.selectedChartType);
-            
-            const baseline = baselineProbabilities[this.selectedChartType];
-            const deviation = currentProb - baseline;
             const deviationBadge = document.querySelector('.deviation-badge');
-            const formattedDeviation = Math.abs(deviation).toFixed(2);
-            
-            deviationBadge.textContent = `${deviation >= 0 ? '+' : '-'}${formattedDeviation}%`;
-            deviationBadge.title = "Deviation of the NEXT pick's probability from the baseline";
-            // Determine badge class based on deviation range
-            let badgeClass;
-            if (deviation >= 3.00) {
-                badgeClass = 'positive';
-            } else if (deviation >= 0.01 && deviation < 3.00) {
-                badgeClass = 'neutral';
-            } else if (deviation === 0.00) {
-                badgeClass = 'zero';
+            const type = this.selectedChartType;
+
+            // Determine the plural key for the initialCounts object
+            const initialCountKey = type + 's';
+            const initialCount = this.initialCounts[initialCountKey];
+
+            // Get the number of already pulled packs of this type
+            const pulledCount = this.packs.filter(p => p.status === type).length;
+
+            // Check if all packs of this type have been pulled
+            if (pulledCount >= initialCount) {
+                deviationBadge.textContent = 'No Remaining Packs';
+                deviationBadge.className = 'deviation-badge negative';
+                deviationBadge.title = `All ${initialCount} ${initialCountKey} have been pulled.`;
             } else {
-                badgeClass = 'negative';
+                // Calculate the current probability for the next selection
+                const currentProb = this.calculateNextProbability(this.selectedChartType);
+                
+                const baseline = baselineProbabilities[this.selectedChartType];
+                const deviation = currentProb - baseline;
+                const formattedDeviation = Math.abs(deviation).toFixed(2);
+                
+                deviationBadge.textContent = `${deviation >= 0 ? '+' : '-'}${formattedDeviation}%`;
+                deviationBadge.title = "Deviation of the NEXT pick's probability from the baseline";
+                // Determine badge class based on deviation range
+                let badgeClass;
+
+                const thresholds = {
+                    chaser: { good: 5.93, bad: -5.93 },
+                    team: { good: 8.80, bad: -8.80 },
+                    floor: { good: 8.43, bad: -8.43 }
+                };
+
+                const typeThresholds = thresholds[type];
+
+                if (deviation > typeThresholds.good) {
+                    badgeClass = 'positive'; // Good Buy
+                } else if (deviation > 0) {
+                    badgeClass = 'neutral'; // Medium Buy (Yellow)
+                } else if (deviation < 0) {
+                    badgeClass = 'negative'; // Bad Buy
+                } else {
+                    badgeClass = 'zero'; // Neutral (Exactly 0)
+                }
+
+                deviationBadge.className = `deviation-badge ${badgeClass}`;
             }
-            deviationBadge.className = `deviation-badge ${badgeClass}`;
         }
     }
 

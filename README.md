@@ -68,6 +68,31 @@ A dynamic line chart that visualizes how probabilities change over time:
 
 That's it! The app runs entirely in your browser and saves all data locally on your computer.
 
+## ⬆️ How to Update to a New Version
+
+Your project data is saved on your computer, which is great! But it means you need to be careful when updating to a new version of the tracker so you don't lose your progress.
+
+Follow these steps to update safely:
+
+1.  **Download and Prepare the New Version**
+    *   Download the new `.zip` file for the latest version.
+    *   Extract the ZIP file:
+        * Windows: Right-click the file and select "Extract All..."
+        * Mac: Double-click the file to automatically extract it
+        * This will create a folder named `yondo-tracker-main`.
+    *   **Important:** When you open this folder, you will likely see *another folder* with the same name inside. This inner folder is the one with the actual application code. **Move this inner folder** into the same directory folder where you want to keep the application. Once it has been removed, there will be two folders with identical names in the same directory. One has the code, the other is completely empty at this point. Delete the empty one. 
+
+2.  **Get Your Old Folder Ready**
+    *   Go to where you have your current, working version of the tracker saved.
+    *   **Rename your current folder.** For example, if your folder is named `yondo-tracker-main`, rename it to `yondo-tracker-old`. This keeps it as a backup.
+
+3.  **Move the New Version Into Place**
+    *   Now, find the new application folder you moved in Step 1.
+    *   **Rename this new folder** to match the *original* name of your old folder. For example, if your old folder was `yondo-tracker-main`, name the new one `yondo-tracker-main`.
+    *   Move this newly renamed folder to the same location where your old one was (e.g., into the `C:\Yondo\` folder from the example below).
+
+Now, when you open `home.html` from the `C:\Yondo\Yondo-Tracker` folder, the new version of the app will load with all of your previous projects and data intact!
+
 ## 📖 How to Use
 
 ### Getting Started
