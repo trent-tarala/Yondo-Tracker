@@ -12,7 +12,12 @@
     <header>
         <div class="container">
             <h1>Yondo Tracker</h1>
-            <button id="newProjectBtn" class="control-btn">New Project</button>
+            <div class="header-controls">
+                <button id="importBtn" class="control-btn secondary-btn">Import Data</button>
+                <input type="file" id="importFile" style="display: none;" accept=".json">
+                <button id="exportBtn" class="control-btn secondary-btn">Export Data</button>
+                <button id="newProjectBtn" class="control-btn">New Project</button>
+            </div>
         </div>
     </header>
 

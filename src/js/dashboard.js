@@ -42,6 +42,88 @@ class ProjectManager {
                 form.reset();
             }
         });
+
+        // Import/Export buttons
+        const importBtn = document.getElementById('importBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const importFile = document.getElementById('importFile');
+
+        exportBtn.addEventListener('click', () => this.exportData());
+        importBtn.addEventListener('click', () => importFile.click());
+        importFile.addEventListener('change', (e) => this.importData(e));
+    }
+
+    exportData() {
+        const data = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('packTracker')) {
+                data[key] = localStorage.getItem(key);
+            }
+        }
+
+        if (Object.keys(data).length === 0) {
+            alert('No data to export!');
+            return;
+        }
+
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'yondo-tracker-backup.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    importData(event) {
+        const file = event.target.files[0];
+        if (!file) {
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                
+                if (!confirm('Are you sure you want to import this data? This will overwrite all current projects.')) {
+                    // Reset the file input so the same file can be selected again
+                    event.target.value = '';
+                    return;
+                }
+
+                // Clear existing pack tracker data
+                for (let i = localStorage.length - 1; i >= 0; i--) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('packTracker')) {
+                        localStorage.removeItem(key);
+                    }
+                }
+
+                // Import new data
+                for (const key in data) {
+                    if (key.startsWith('packTracker')) {
+                        localStorage.setItem(key, data[key]);
+                    }
+                }
+
+                alert('Data imported successfully!');
+                this.loadProjects(); // Refresh the dashboard view
+
+            } catch (error) {
+                alert('Error reading or parsing the file. Please make sure it is a valid backup file.');
+                console.error('Import error:', error);
+            } finally {
+                // Reset the file input so the same file can be selected again
+                event.target.value = '';
+            }
+        };
+                reader.readAsText(file);
     }
 
     loadProjects() {

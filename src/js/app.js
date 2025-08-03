@@ -93,12 +93,10 @@ class PackTracker {
                         label: 'Current Probability',
                         data: [],
                         borderColor: 'rgb(75, 192, 192)',
-                        borderWidth: 2,
+                        borderWidth: 3,
                         tension: 0.4,
                         fill: false,
-                        spanGaps: false, // Don't connect through null values
-                        borderWidth: 3, // Slightly thicker line for better curve visibility
-                        cubicInterpolationMode: 'default' // Natural curve interpolation
+                        spanGaps: false,
                     },
                     {
                         label: 'Baseline',
@@ -141,7 +139,7 @@ class PackTracker {
                     x: {
                         title: {
                             display: true,
-                            text: 'Pack Number',
+                            text: 'Selected Packs',
                             padding: { top: 20 } // Add padding to account for rotated labels
                         },
                         ticks: {
@@ -162,9 +160,10 @@ class PackTracker {
                             text: 'Probability'
                         },
                         min: 0,
-                        suggestedMax: 25,
+                        suggestedMax: 75,
                         ticks: {
-                            callback: (value) => `${Math.round(value)}%`
+                            callback: (value) => `${Math.round(value)}%`,
+                            stepSize: 5
                         }
                     }
                 }
@@ -182,10 +181,10 @@ class PackTracker {
         });
     }
 
+
+
     updateChart() {
-        // console.log('updateChart called');
         if (!this.chart) {
-            // console.log('Chart is null, returning');
             return;
         }
 
@@ -194,34 +193,47 @@ class PackTracker {
             team: (this.initialCounts.teams / this.totalPacks) * 100,
             floor: (this.initialCounts.floors / this.totalPacks) * 100
         };
+        const baseline = baselineProbabilities[this.selectedChartType];
 
-        const currentProbs = this.probabilityHistory[this.selectedChartType + 's'];
-        // console.log('Selected chart type:', this.selectedChartType);
-        // console.log('Current probabilities:', currentProbs);
-        
-        // Map pack numbers to sequential positions for the chart
         const displayData = new Array(this.totalPacks + 1).fill(null);
-        displayData[0] = currentProbs[0]; // Always show the zero point
-        
-        // Find all opened packs and map them to sequential positions
-        const openedPacks = [];
-        for (let i = 1; i <= this.totalPacks; i++) {
-            if (currentProbs[i] !== null) {
-                openedPacks.push({ packNumber: i, probability: currentProbs[i] });
+        displayData[0] = baseline;
+
+        const openingActions = this.actionHistory.filter(action => 
+            action.type === 'markPack' && 
+            action.oldStatus === 'unopened'
+        );
+
+        let openedSoFar = [];
+        openingActions.forEach((action, sequentialIndex) => {
+            const unopenedCount = this.totalPacks - openedSoFar.length;
+            let remainingOfType;
+            let typeName = this.selectedChartType;
+
+            if (unopenedCount > 0) {
+                if (typeName === 'chaser') {
+                    remainingOfType = this.initialCounts.chasers - openedSoFar.filter(p => p.status === 'chaser').length;
+                } else if (typeName === 'team') {
+                    remainingOfType = this.initialCounts.teams - openedSoFar.filter(p => p.status === 'team').length;
+                } else { // floor
+                    remainingOfType = this.initialCounts.floors - openedSoFar.filter(p => p.status === 'floor').length;
+                }
+
+                const probabilityForThisPick = (remainingOfType / unopenedCount) * 100;
+                displayData[sequentialIndex + 1] = probabilityForThisPick;
+
+                console.log(`--- Pick ${sequentialIndex + 1} (New Status: ${action.newStatus}) ---`);
+                console.log(`Unopened packs before this pick: ${unopenedCount}`);
+                console.log(`Remaining ${typeName}s before this pick: ${remainingOfType}`);
+                console.log(`Calculated probability: ${probabilityForThisPick.toFixed(2)}%`);
             }
-        }
-        
-        // Sort by pack number and assign to sequential positions
-        openedPacks.sort((a, b) => a.packNumber - b.packNumber);
-        openedPacks.forEach((pack, sequentialIndex) => {
-            displayData[sequentialIndex + 1] = pack.probability;
+
+            // Now, add the outcome of the current pick to the history for the *next* loop iteration.
+            openedSoFar.push({ status: action.newStatus });
         });
         
-        // Always create 61 labels (0-60) for all packs
         const labels = Array.from({ length: this.totalPacks + 1 }, (_, i) => i);
-        const baselineData = Array(this.totalPacks + 1).fill(baselineProbabilities[this.selectedChartType]);
+        const baselineData = Array(this.totalPacks + 1).fill(baseline);
 
-        // Update chart colors based on selected type
         let color;
         switch (this.selectedChartType) {
             case 'chaser':
@@ -235,75 +247,50 @@ class PackTracker {
                 break;
         }
 
-        // console.log('Chart data being set:');
-        // console.log('Labels:', labels);
-        // console.log('Display data:', displayData);
-        // console.log('Baseline data:', baselineData);
-        
         this.chart.data.labels = labels;
         this.chart.data.datasets[0].data = displayData;
         this.chart.data.datasets[0].borderColor = color;
         this.chart.data.datasets[1].data = baselineData;
 
-        // Update y-axis scale if needed
-        const maxProb = Math.max(...currentProbs, baselineProbabilities[this.selectedChartType]);
-        // console.log('Max probability:', maxProb);
-        this.chart.options.scales.y.suggestedMax = Math.ceil(maxProb / 5) * 5;
-
-        // console.log('Calling chart.update()');
         this.chart.update();
-        // console.log('Chart update complete');
 
         // Update deviation badge
-        if (currentProbs.length > 0) {
-            const deviationBadge = document.querySelector('.deviation-badge');
-            const type = this.selectedChartType;
+        const deviationBadge = document.querySelector('.deviation-badge');
+        const type = this.selectedChartType;
+        const initialCountKey = type + 's';
+        const initialCount = this.initialCounts[initialCountKey];
+        const pulledCount = this.packs.filter(p => p.status === type).length;
 
-            // Determine the plural key for the initialCounts object
-            const initialCountKey = type + 's';
-            const initialCount = this.initialCounts[initialCountKey];
+        if (pulledCount >= initialCount) {
+            deviationBadge.textContent = 'No Remaining Packs';
+            deviationBadge.className = 'deviation-badge negative';
+            deviationBadge.title = `All ${initialCount} ${initialCountKey} have been pulled.`;
+        } else {
+            const currentProb = this.calculateNextProbability(type);
+            const deviation = currentProb - baseline;
+            const formattedDeviation = Math.abs(deviation).toFixed(2);
+            
+            deviationBadge.textContent = `${deviation >= 0 ? '+' : '-'}${formattedDeviation}%`;
+            deviationBadge.title = "Deviation of the NEXT pick's probability from the baseline";
+            
+            let badgeClass;
+            const thresholds = {
+                chaser: { good: 5.93 },
+                team: { good: 8.80 },
+                floor: { good: 8.43 }
+            };
+            const typeThresholds = thresholds[type];
 
-            // Get the number of already pulled packs of this type
-            const pulledCount = this.packs.filter(p => p.status === type).length;
-
-            // Check if all packs of this type have been pulled
-            if (pulledCount >= initialCount) {
-                deviationBadge.textContent = 'No Remaining Packs';
-                deviationBadge.className = 'deviation-badge negative';
-                deviationBadge.title = `All ${initialCount} ${initialCountKey} have been pulled.`;
+            if (deviation > typeThresholds.good) {
+                badgeClass = 'positive';
+            } else if (deviation > 0) {
+                badgeClass = 'neutral';
+            } else if (deviation < 0) {
+                badgeClass = 'negative';
             } else {
-                // Calculate the current probability for the next selection
-                const currentProb = this.calculateNextProbability(this.selectedChartType);
-                
-                const baseline = baselineProbabilities[this.selectedChartType];
-                const deviation = currentProb - baseline;
-                const formattedDeviation = Math.abs(deviation).toFixed(2);
-                
-                deviationBadge.textContent = `${deviation >= 0 ? '+' : '-'}${formattedDeviation}%`;
-                deviationBadge.title = "Deviation of the NEXT pick's probability from the baseline";
-                // Determine badge class based on deviation range
-                let badgeClass;
-
-                const thresholds = {
-                    chaser: { good: 5.93, bad: -5.93 },
-                    team: { good: 8.80, bad: -8.80 },
-                    floor: { good: 8.43, bad: -8.43 }
-                };
-
-                const typeThresholds = thresholds[type];
-
-                if (deviation > typeThresholds.good) {
-                    badgeClass = 'positive'; // Good Buy
-                } else if (deviation > 0) {
-                    badgeClass = 'neutral'; // Medium Buy (Yellow)
-                } else if (deviation < 0) {
-                    badgeClass = 'negative'; // Bad Buy
-                } else {
-                    badgeClass = 'zero'; // Neutral (Exactly 0)
-                }
-
-                deviationBadge.className = `deviation-badge ${badgeClass}`;
+                badgeClass = 'zero';
             }
+            deviationBadge.className = `deviation-badge ${badgeClass}`;
         }
     }
 
@@ -536,7 +523,8 @@ class PackTracker {
         this.actionHistory.push({
             type: 'markPack',
             packIndex,
-            oldState
+            oldStatus: oldState.status,
+            newStatus: type
         });
 
         this.updateUI();
@@ -839,6 +827,10 @@ class PackTracker {
         document.getElementById('chaserRemaining').textContent = `${remainingChasers}/${this.initialCounts.chasers}`;
         document.getElementById('teamRemaining').textContent = `${remainingTeams}/${this.initialCounts.teams}`;
         document.getElementById('floorRemaining').textContent = `${remainingFloors}/${this.initialCounts.floors}`;
+
+        const totalRemaining = remainingChasers + remainingTeams + remainingFloors;
+        const titleElement = document.querySelector('.remaining-packs-panel h2');
+        titleElement.textContent = `Remaining Packs - ${totalRemaining}/${this.totalPacks}`;
     }
 
     updatePulledPacksDisplay() {

@@ -93,6 +93,23 @@ Follow these steps to update safely:
 
 Now, when you open `home.html` from the `C:\Yondo\Yondo-Tracker` folder, the new version of the app will load with all of your previous projects and data intact!
 
+## 💾 Data Management (Import & Export)
+
+Your data is saved in your browser, which is convenient but can be lost if you clear your browser's cache. To keep your data safe, you can use the built-in import and export tools.
+
+*   **Export Data:**
+    1.  On the dashboard, click the **"Export Data"** button.
+    2.  This will save a single file named `yondo-tracker-backup.json` to your computer's "Downloads" folder.
+    3.  This file contains all of your projects. Save this file in a safe place!
+
+*   **Import Data:**
+    1.  On the dashboard, click the **"Import Data"** button.
+    2.  Select the `yondo-tracker-backup.json` file you previously saved.
+    3.  A confirmation box will appear. **Warning:** Importing a file will overwrite all existing projects in the tracker.
+    4.  If you confirm, all projects from the file will be loaded into the application.
+
+This is the best way to back up your work, move it between different computers, or recover it if your browser data is ever cleared.
+
 ## 📖 How to Use
 
 ### Getting Started
